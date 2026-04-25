@@ -1,0 +1,70 @@
+spring:
+    application:
+        name: camel-poc
+    ldap:
+        urls: ${SPRING_LDAP_URLS:ldap://localhost:8389}
+        base: ${SPRING_LDAP_BASE:dc=ljcomputing,dc=net}
+        username: ${SPRING_LDAP_USERNAME:cn=admin,dc=ljcomputing,dc=net}
+        password: ${SPRING_LDAP_PASSWORD:admin}
+    devtools:
+        restart:
+            enabled: true
+            poll-interval: 5s
+            quiet-period: 1s
+
+server:
+    servlet:
+        context-path: /
+    error:
+        whitelabel:
+            enabled: false
+
+application:
+    name: camel-poc
+    version: 1.0.0
+    description: Camel Proof of Concept Application
+
+# JWT configuration
+# secret must be a Base64-encoded key of at least 32 bytes (256 bits) for HS256
+# Generate with: openssl rand -base64 32
+jwt:
+    secret: ${JWT_SECRET:4KrLbsJJFkHW2RqxT7FCiYv3puEes90T6yeRaSt67V4=}
+    expiration: 3600 # seconds
+
+springdoc:
+  swagger-ui:
+    url: /api-docs
+
+camel:
+    health:
+        enabled: true
+    main:
+        routes-include-pattern: "classpath:routes/*.yaml"
+    servlet:
+        mapping:
+            context-path: /camel
+    rest:
+        context-path: /v1/api
+        api-context-path: /v3/api-docs
+    openapi:
+        enabled: true
+    springdoc:
+        enabled: true
+    component:
+        thymeleaf:
+            enabled: true
+        jackson:
+            enabled: true
+            enable-type-converters: true
+    variables:
+        jsonInputPath: "/data/in"
+        jsonOutputPath: "/data/out"
+        jsonErrorPath: "/data/error"
+        jsonToHtmlPath: "/data/json-to-html"
+        pdfOutputPath: "/data/pdf"
+
+logging:
+  level:
+    org.apache.camel: INFO
+    org.apache.camel.component.file: INFO
+    org.springframework: INFO

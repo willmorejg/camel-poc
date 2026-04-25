@@ -1,0 +1,40 @@
+# @name tokenrequest
+curl -X 'POST' \
+  'http://localhost:8080/oauth/token' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "grant_type": "password",
+    "username": "johndoe",
+    "password": "password123"
+  }'
+
+@token = {{tokenrequest.response.body.access_token}}
+
+###
+curl -X 'POST' \
+  'http://localhost:8080/v1/api/ingest/upload' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer {{token}}' \
+  -d '[
+        {
+            "name": "James G Willmore",
+            "address1": "832 Savitt Place",
+            "address2": "",
+            "city": "Union",
+            "state": "NJ",
+            "zip": "07083",
+            "zip4": "6710"
+        },
+        {
+            "name": "Lynn E Pinard-Willmore",
+            "address1": "832 Savitt Place",
+            "address2": "",
+            "city": "Union",
+            "state": "NJ",
+            "zip": "07083",
+            "zip4": "6710"
+        }
+    ]'
+###

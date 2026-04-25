@@ -1,0 +1,72 @@
+services:
+
+  openldap:
+    image: osixia/openldap:1.5.0
+    command: --copy-service
+    restart: unless-stopped
+    container_name: openldap
+    environment:
+      LDAP_TLS: "false"
+      LDAP_ORGANISATION: "LJ Computing"
+      LDAP_DOMAIN: ljcomputing.net
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      LDAP_ENABLE_PPOLICY: "true"
+      LDAP_PPOLICY_DN: cn=default,ou=policies,dc=ljcomputing,dc=net
+    volumes:
+      - ./ldap/data:/var/lib/ldap
+      - ./ldap/config:/etc/ldap/slapd.d
+      - ./ldap/bootstrap/bootstrap.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-bootstrap.ldif
+    networks:
+      - ldap_network
+    ports:
+      - "8389:389"
+    healthcheck:
+      test:
+        - CMD
+        - ldapsearch
+        - -x
+        - -H
+        - ldap://localhost:389
+        - -b
+        - dc=ljcomputing,dc=net
+        - -D
+        - cn=admin,dc=ljcomputing,dc=net
+        - -w
+        - ${LDAP_ADMIN_PASSWORD:-admin}
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:0.9.0
+    restart: on-failure
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: openldap
+      PHPLDAPADMIN_HTTPS: "false"
+    ports:
+      - "8081:80"
+    networks:
+      - ldap_network
+    depends_on:
+      openldap:
+        condition: service_healthy
+
+  camel-poc:
+    build: .
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-4KrLbsJJFkHW2RqxT7FCiYv3puEes90T6yeRaSt67V4=}
+      SPRING_LDAP_URLS: ldap://openldap:8389
+      SPRING_LDAP_BASE: dc=ljcomputing,dc=net
+      SPRING_LDAP_USERNAME: cn=admin,dc=ljcomputing,dc=net
+      SPRING_LDAP_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+    ports:
+      - "8080:8080"
+    networks:
+      - ldap_network
+    depends_on:
+      openldap:
+        condition: service_healthy
+
+networks:
+  ldap_network:

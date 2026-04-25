@@ -1,0 +1,66 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.14'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'net.ljcomputing'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+configurations.all {
+    exclude group: "commons-logging", module: "commons-logging"
+}
+
+dependencies {
+	implementation "org.apache.camel.springboot:camel-spring-boot-starter:${camelVersion}"
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.security:spring-security-oauth2-jose'
+	implementation 'org.springframework.security:spring-security-ldap'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
+
+    implementation "org.apache.camel:camel-rest-openapi:${camelVersion}"
+    implementation "org.apache.camel:camel-openapi-java:${camelVersion}"
+
+    // camel-thymeleaf has no camel-quarkus counterpart - version must match
+    // your Camel version. Run: ./gradlew dependencies | grep camel-core
+    // to find the version, then set it in gradle.properties as camelVersion=x.x.x
+    implementation "org.apache.camel:camel-thymeleaf:${camelVersion}"
+
+	implementation "org.apache.camel.springboot:camel-yaml-dsl-starter:${camelVersion}"
+	implementation "org.apache.camel.springboot:camel-jackson-starter:${camelVersion}"
+    implementation "org.apache.camel.springboot:camel-http-starter:${camelVersion}"
+    implementation "org.apache.camel.springboot:camel-platform-http-starter:${camelVersion}"
+    implementation "org.apache.camel.springboot:camel-servlet-starter:${camelVersion}"
+    implementation "org.apache.camel.springboot:camel-rest-starter:${camelVersion}"
+
+    // PDFBox 3.x - explicit version required since camel-quarkus-pdf was removed
+    implementation 'org.apache.pdfbox:pdfbox:3.0.3'
+
+    // HTML to PDF - Flying Saucer + OpenPDF (no PDFBox dependency, no conflict)
+    implementation 'org.xhtmlrenderer:flying-saucer-pdf-openpdf:9.3.1'
+    implementation 'com.github.librepdf:openpdf:1.3.43'
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

@@ -1,0 +1,71 @@
+- rest:
+    post:
+      - path: /ingest/upload
+        consumes: application/json
+        produces: application/json
+        description: "Accept a JSON payload and write it to the incoming file directory"
+        param:
+          - name: body
+            type: body
+            description: "JSON payload to persist"
+            required: true
+            dataType: string
+        responseMessage:
+          - code: "200"
+            message: "Payload written successfully"
+          - code: "500"
+            message: "File write failed"
+        to: direct:writeToFile
+
+- route:
+    id: rest-to-file
+    from:
+      uri: direct:writeToFile
+      steps:
+        - log:
+            message: "Received payload: ${body}"
+        - setHeader:
+            name: CamelFileName
+            simple: "payload-${date:now:yyyyMMdd-HHmmssSSS}.json"
+        - doTry:
+            steps:
+              - setProperty:
+                  name: writeSuccess
+                  constant: "false"
+              - multicast:
+                  parallelProcessing: true
+                  steps:
+                    - to: "file:{{camel.variables.jsonInputPath}}?delete=false"
+                    - to: "file:{{camel.variables.jsonOutputPath}}?delete=false"
+              - setProperty:
+                  name: writeSuccess
+                  constant: "true"
+            doCatch:
+              - exception:
+                  - java.lang.Exception
+                steps:
+                  - setProperty:
+                      name: writeSuccess
+                      constant: "false"
+                  - log:
+                      loggingLevel: ERROR
+                      message: "File write failed: ${exception.message} - attempting cleanup of ${header.CamelFileName}"
+                  - to:
+                      uri: "bean:fileCleanupBean?method=deleteIfExists"
+        - setHeader:
+            name: Content-Type
+            constant: application/json
+        - setBody:
+            simple: '{"success": ${exchangeProperty.writeSuccess}}'
+        - choice:
+            when:
+              - simple: "${exchangeProperty.writeSuccess} == 'true'"
+                steps:
+                  - setHeader:
+                      name: CamelHttpResponseCode
+                      constant: 200
+            otherwise:
+              steps:
+                - setHeader:
+                    name: CamelHttpResponseCode
+                    constant: 500
