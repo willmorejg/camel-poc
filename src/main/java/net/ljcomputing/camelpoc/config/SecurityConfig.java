@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import jakarta.servlet.DispatcherType;
-import net.ljcomputing.camelpoc.security.JwtAuthenticationFilter;
+import net.ljcomputing.camelpoc.filter.JwtAuthenticationFilter;
 import net.ljcomputing.camelpoc.security.JwtTokenService;
 import net.ljcomputing.camelpoc.security.UnauthorizedEntryPoint;
 
