@@ -25,6 +25,7 @@ dependencies {
 	implementation "org.apache.camel.springboot:camel-spring-boot-starter:${camelVersion}"
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-oauth2-jose'
 	implementation 'org.springframework.security:spring-security-ldap'
@@ -32,6 +33,7 @@ dependencies {
 
     implementation "org.apache.camel:camel-rest-openapi:${camelVersion}"
     implementation "org.apache.camel:camel-openapi-java:${camelVersion}"
+    implementation "org.apache.camel:camel-csv:${camelVersion}"
 
     // camel-thymeleaf has no camel-quarkus counterpart - version must match
     // your Camel version. Run: ./gradlew dependencies | grep camel-core
@@ -40,10 +42,15 @@ dependencies {
 
 	implementation "org.apache.camel.springboot:camel-yaml-dsl-starter:${camelVersion}"
 	implementation "org.apache.camel.springboot:camel-jackson-starter:${camelVersion}"
+    implementation "org.apache.camel.springboot:camel-jacksonxml-starter:${camelVersion}"
     implementation "org.apache.camel.springboot:camel-http-starter:${camelVersion}"
     implementation "org.apache.camel.springboot:camel-platform-http-starter:${camelVersion}"
     implementation "org.apache.camel.springboot:camel-servlet-starter:${camelVersion}"
     implementation "org.apache.camel.springboot:camel-rest-starter:${camelVersion}"
+    implementation "org.apache.camel.springboot:camel-jdbc-starter:${camelVersion}"
+
+	implementation "org.duckdb:duckdb_jdbc:1.5.2.0"
+	implementation "org.postgresql:postgresql:42.7.3"
 
     // PDFBox 3.x - explicit version required since camel-quarkus-pdf was removed
     implementation 'org.apache.pdfbox:pdfbox:3.0.3'

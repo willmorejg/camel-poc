@@ -1,0 +1,132 @@
+- route:
+    id: xml-to-in-wsdl
+    from:
+      uri: "platform-http:/v1/ws/address-records"
+      parameters:
+        httpMethodRestrict: GET
+      steps:
+        - choice:
+            when:
+              - simple: "${header.CamelHttpQuery} regex '.*(^|&)wsdl($|&).*'"
+                steps:
+                  - setHeader:
+                      name: Content-Type
+                      constant: text/xml; charset=UTF-8
+                  - setBody:
+                      constant: |
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+                                     xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                                     xmlns:tns="http://ljcomputing.net/address"
+                                     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                                     targetNamespace="http://ljcomputing.net/address"
+                                     name="AddressRecordService">
+                          <types>
+                            <xsd:schema targetNamespace="http://ljcomputing.net/address" elementFormDefault="qualified">
+                              <xsd:element name="submitAddressRecordsRequest">
+                                <xsd:complexType>
+                                  <xsd:sequence>
+                                    <xsd:any minOccurs="1" maxOccurs="1" processContents="skip"/>
+                                  </xsd:sequence>
+                                </xsd:complexType>
+                              </xsd:element>
+                              <xsd:element name="submitAddressRecordsResponse">
+                                <xsd:complexType>
+                                  <xsd:sequence>
+                                    <xsd:element name="success" type="xsd:boolean"/>
+                                    <xsd:element name="message" type="xsd:string"/>
+                                    <xsd:element name="filename" type="xsd:string" minOccurs="0"/>
+                                  </xsd:sequence>
+                                </xsd:complexType>
+                              </xsd:element>
+                            </xsd:schema>
+                          </types>
+
+                          <message name="SubmitAddressRecordsInput">
+                            <part name="parameters" element="tns:submitAddressRecordsRequest"/>
+                          </message>
+                          <message name="SubmitAddressRecordsOutput">
+                            <part name="parameters" element="tns:submitAddressRecordsResponse"/>
+                          </message>
+
+                          <portType name="AddressRecordPortType">
+                            <operation name="submitAddressRecords">
+                              <input message="tns:SubmitAddressRecordsInput"/>
+                              <output message="tns:SubmitAddressRecordsOutput"/>
+                            </operation>
+                          </portType>
+
+                          <binding name="AddressRecordSoapBinding" type="tns:AddressRecordPortType">
+                            <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+                            <operation name="submitAddressRecords">
+                              <soap:operation soapAction="submitAddressRecords"/>
+                              <input>
+                                <soap:body use="literal"/>
+                              </input>
+                              <output>
+                                <soap:body use="literal"/>
+                              </output>
+                            </operation>
+                          </binding>
+
+                          <service name="AddressRecordService">
+                            <documentation>SOAP endpoint to submit address record XML payloads.</documentation>
+                            <port name="AddressRecordPort" binding="tns:AddressRecordSoapBinding">
+                              <soap:address location="http://localhost:8080/v1/ws/address-records"/>
+                            </port>
+                          </service>
+                        </definitions>
+            otherwise:
+              steps:
+                - setHeader:
+                    name: CamelHttpResponseCode
+                    constant: 400
+                - setHeader:
+                    name: Content-Type
+                    constant: text/plain
+                - setBody:
+                    constant: "WSDL available at /v1/ws/address-records?wsdl"
+
+- route:
+    id: xml-to-in-submit
+    from:
+      uri: "platform-http:/v1/ws/address-records"
+      parameters:
+        httpMethodRestrict: POST
+      steps:
+        - setHeader:
+            name: Content-Type
+            constant: text/xml; charset=UTF-8
+        - doTry:
+            steps:
+              - process:
+                  ref: soapEnvelopeAddressExtractorProcessor
+              - validate:
+                  simple: "${body} regex '(?s).*<addresses>.*</addresses>.*'"
+              - setHeader:
+                  name: CamelFileName
+                  simple: "ws-addresses-${date:now:yyyyMMdd-HHmmssSSS}.xml"
+              - to:
+                  uri: "file:{{camel.variables.jsonInputPath}}"
+                  parameters:
+                    fileExist: Override
+              - setBody:
+                  simple: |
+                    <submitAddressRecordsResponse xmlns="http://ljcomputing.net/address">
+                      <success>true</success>
+                      <message>XML payload accepted</message>
+                      <filename>${header.CamelFileName}</filename>
+                    </submitAddressRecordsResponse>
+            doCatch:
+              - exception:
+                  - java.lang.Exception
+                steps:
+                  - setHeader:
+                      name: CamelHttpResponseCode
+                      constant: 400
+                  - setBody:
+                      simple: |
+                        <submitAddressRecordsResponse xmlns="http://ljcomputing.net/address">
+                          <success>false</success>
+                          <message>${exception.message}</message>
+                        </submitAddressRecordsResponse>

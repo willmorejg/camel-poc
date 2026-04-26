@@ -1,6 +1,9 @@
 spring:
     application:
         name: camel-poc
+    datasource:
+        url: "jdbc:duckdb:"
+        driver-class-name: org.duckdb.DuckDBDriver
     ldap:
         urls: ${SPRING_LDAP_URLS:ldap://localhost:8389}
         base: ${SPRING_LDAP_BASE:dc=ljcomputing,dc=net}
@@ -45,6 +48,7 @@ camel:
             context-path: /camel
     rest:
         context-path: /v1/api
+        api-context-route-id: camel-rest-api-docs
         api-context-path: /v3/api-docs
     openapi:
         enabled: true
@@ -61,7 +65,11 @@ camel:
         jsonOutputPath: "/data/out"
         jsonErrorPath: "/data/error"
         jsonToHtmlPath: "/data/json-to-html"
+        jsonToProcessPath: "/data/json-to-process"
         pdfOutputPath: "/data/pdf"
+        geoJsonInputPath: "/data/geo/in"
+        geoJsonOutputPath: "/data/geo/out"
+        geoJsonErrorPath: "/data/geo/error"
 
 logging:
   level:

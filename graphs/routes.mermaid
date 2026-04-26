@@ -1,0 +1,18 @@
+flowchart LR
+    subgraph CamelRoute["Camel Route: payment-route"]
+        A["from: timer/payments"] --> B["poll source"]
+        B --> C["transform"]
+        C --> D{"choice"}
+        D -->|Origami| E["to: direct:origami"]
+        D -->|IBMi| F["to: direct:ibmi"]
+    end
+
+    subgraph ExternalSystems["External Systems"]
+        E --> G["Origami API"]
+        F --> H["IBMi Service"]
+    end
+
+    subgraph ExternalSystems2["External Systems 2"]
+        E --> G["Origami API"]
+        F --> H["IBMi Service"]
+    end

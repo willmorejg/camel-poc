@@ -1,0 +1,46 @@
+{
+  "groups": [
+    {
+      "name": "application",
+      "type": "net.ljcomputing.camelpoc.config.ApplicationProperties",
+      "sourceType": "net.ljcomputing.camelpoc.config.ApplicationProperties"
+    },
+    {
+      "name": "jwt",
+      "type": "net.ljcomputing.camelpoc.config.JwtProperties",
+      "sourceType": "net.ljcomputing.camelpoc.config.JwtProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "application.description",
+      "type": "java.lang.String",
+      "sourceType": "net.ljcomputing.camelpoc.config.ApplicationProperties"
+    },
+    {
+      "name": "application.name",
+      "type": "java.lang.String",
+      "sourceType": "net.ljcomputing.camelpoc.config.ApplicationProperties"
+    },
+    {
+      "name": "application.version",
+      "type": "java.lang.String",
+      "sourceType": "net.ljcomputing.camelpoc.config.ApplicationProperties"
+    },
+    {
+      "name": "jwt.expiration",
+      "type": "java.lang.Long",
+      "sourceType": "net.ljcomputing.camelpoc.config.JwtProperties",
+      "defaultValue": 0
+    },
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "sourceType": "net.ljcomputing.camelpoc.config.JwtProperties"
+    }
+  ],
+  "hints": [],
+  "ignored": {
+    "properties": []
+  }
+}

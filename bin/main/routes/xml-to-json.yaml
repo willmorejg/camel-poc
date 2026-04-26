@@ -1,0 +1,57 @@
+# - onException:
+#     exception:
+#       - com.fasterxml.jackson.databind.exc.MismatchedInputException
+#     handled:
+#       constant: true
+#     steps:
+#       - log:
+#           loggingLevel: ERROR
+#           message: >-
+#             Invalid CSV structure in ${header.CamelFileName} - expected an
+#             array of AddressRecord objects. Deleting. Error:
+#             ${exception.message}
+#       - to:
+#           uri: "bean:fileCleanupBean?method=deleteIfExists"
+
+- route:
+    id: xml-to-json
+    from:
+      uri: "file:{{camel.variables.jsonInputPath}}"
+      parameters:
+        delete: true
+        readLock: changed
+        readLockCheckInterval: 500
+        readLockTimeout: 10000
+        include: ".*\\.xml"
+        recursive: false
+      steps:
+        - log:
+            message: "Processing XML file: ${header.CamelFileName}"
+        - setProperty:
+            name: baseFileName
+            expression:
+              simple: "${file:name.noext}"
+        - doTry:
+            steps:
+              - unmarshal:
+                  jacksonXml:
+                    unmarshalType: java.util.Map
+              - process:
+                  ref: xmlAddressListProcessor
+              - marshal:
+                  json: {}
+              - to:
+                  uri: "file:{{camel.variables.jsonToProcessPath}}?fileName=${header.baseFileName}.json"
+              - to:
+                  uri: "bean:fileCleanupBean?method=deleteIfExists"
+              - log:
+                  message: "Successfully processed ${header.CamelFileName} to JSON"
+            doCatch:
+              - exception:
+                  - java.lang.Exception
+                steps:
+                  - to:
+                      uri: "bean:fileCleanupBean?method=moveToError"
+                  - log:
+                      loggingLevel: ERROR
+                      message: "Error processing ${header.CamelFileName}: ${exception.message}\n${exception.stacktrace}"

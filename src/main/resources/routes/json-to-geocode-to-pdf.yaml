@@ -14,8 +14,7 @@
           uri: "bean:fileCleanupBean?method=deleteIfExists"
 
 - route:
-    id: json-to-pdf
-    auto-startup: false
+    id: json-to-geocode-to-pdf
     from:
       uri: "file:{{camel.variables.jsonToProcessPath}}"
       parameters:
@@ -38,17 +37,13 @@
               simple: "${date:now:yyyyMMdd-HHmmss-SSSSS}"
         - doTry:
             steps:
-              - multicast:
-                  parallelProcessing: false
-                  steps:
-                    - to: "file:{{camel.variables.geoJsonInputPath}}?delete=false&fileName=${exchangeProperty.baseFileName}-${exchangeProperty.nowTimestamp}.json"
               - unmarshal:
                   json:
                     library: Jackson
                     useList: true
               - process:
-                  ref: addressRecordListProcessor
-              - to: "thymeleaf:templates/record.html"
+                  ref: geocodeAddressRecordListProcessor
+              - to: "thymeleaf:templates/record-geo.html"
               - setHeader:
                   name: CamelFileName
                   expression:

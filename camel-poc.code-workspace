@@ -2,12 +2,16 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../../../../../../data"
 		}
 	],
 	"settings": {
 		"java.configuration.updateBuildConfiguration": "interactive",
 		"java.compile.nullAnalysis.mode": "automatic",
 		"camel.Camel catalog runtime provider": "DEFAULT",
-		"java.autobuild.enabled": true
+		"java.autobuild.enabled": true,
+		"liveServer.settings.multiRootWorkspaceName": "data"
 	}
 }
