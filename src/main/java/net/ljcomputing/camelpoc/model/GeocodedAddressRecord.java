@@ -17,14 +17,10 @@ public class GeocodedAddressRecord extends AddressRecord {
         super();
     }
 
-    public GeocodedAddressRecord(String name, String address1, String address2, String city, String state, String zip, String zip4, GeoCoordinate geocodedCoordinate) {
-        super(name, address1, address2, city, state, zip, zip4);
-        this.geocodedCoordinate = geocodedCoordinate;
-    }
-
-    public GeocodedAddressRecord(String name, String address1, String city, String state, String zip, String zip4, GeoCoordinate geocodedCoordinate) {
+    public GeocodedAddressRecord(String name, String address1, String city, String state, String zip, String zip4, String tileUrl, GeoCoordinate geocodedCoordinate) {
         super(name, address1, null, city, state, zip, zip4);
         this.geocodedCoordinate = geocodedCoordinate;
+        this.tileUrl = tileUrl;
     }
 
     public GeoCoordinate getGeocodedCoordinate() {

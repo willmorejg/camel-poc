@@ -1,18 +1,3 @@
-# - onException:
-#     exception:
-#       - com.fasterxml.jackson.databind.exc.MismatchedInputException
-#     handled:
-#       constant: true
-#     steps:
-#       - log:
-#           loggingLevel: ERROR
-#           message: >-
-#             Invalid CSV structure in ${header.CamelFileName} - expected an
-#             array of AddressRecord objects. Deleting. Error:
-#             ${exception.message}
-#       - to:
-#           uri: "bean:fileCleanupBean?method=deleteIfExists"
-
 - route:
     id: xml-to-json
     from:
@@ -41,7 +26,7 @@
               - marshal:
                   json: {}
               - to:
-                  uri: "file:{{camel.variables.jsonToProcessPath}}?fileName=${header.baseFileName}.json"
+                  uri: "file:{{camel.variables.jsonToProcessPath}}?fileName=${header.baseFileName}-xml.json"
               - to:
                   uri: "bean:fileCleanupBean?method=deleteIfExists"
               - log:

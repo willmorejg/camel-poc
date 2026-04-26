@@ -26,7 +26,7 @@
                   json: {}
               - to:
                   uri: >-
-                    file:{{camel.variables.jsonToProcessPath}}?delete=false&fileName=${header.baseFileName}.json
+                    file:{{camel.variables.jsonToProcessPath}}?delete=false&fileName=${header.baseFileName}-csv.json
               - to:
                   uri: 'bean:fileCleanupBean?method=deleteIfExists'
               - log:

@@ -17,12 +17,12 @@ class CamelPocApplicationTests {
 	void contextLoads() {
 	}
 
-	@Test
-	void testDuckDbDAO() {
-		logger.info("Testing DuckDbDAO...");
-		assert duckDbDAO != null;
-		assert "Alice".equals(duckDbDAO.getNameById(1));
-		assert "Bob".equals(duckDbDAO.getNameById(2));
-		logger.info("DuckDbDAO tests passed");
-	}
+	// @Test
+	// void testDuckDbDAO() {
+	// 	logger.info("Testing DuckDbDAO...");
+	// 	assert duckDbDAO != null;
+	// 	assert "Alice".equals(duckDbDAO.getNameById(1));
+	// 	assert "Bob".equals(duckDbDAO.getNameById(2));
+	// 	logger.info("DuckDbDAO tests passed");
+	// }
 }

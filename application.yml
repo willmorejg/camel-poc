@@ -2,7 +2,7 @@ spring:
     application:
         name: camel-poc
     datasource:
-        url: "jdbc:duckdb:"
+        url: "jdbc:duckdb:data/camel-poc.duckdb"
         driver-class-name: org.duckdb.DuckDBDriver
     ldap:
         urls: ${SPRING_LDAP_URLS:ldap://localhost:8389}
