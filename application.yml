@@ -60,12 +60,21 @@ camel:
         jackson:
             enabled: true
             enable-type-converters: true
+        aws2-s3:
+            access-key: ${AWS_ACCESS_KEY_ID:minioadmin}
+            secret-key: ${AWS_SECRET_ACCESS_KEY:minioadmin}
+            region: ${AWS_REGION:us-east-1}
+            override-endpoint: true
+            uri-endpoint-override: ${S3_ENDPOINT_URL:http://localhost:8333}
+            force-path-style: true
     variables:
         jsonInputPath: "/data/in"
         jsonOutputPath: "/data/out"
         jsonErrorPath: "/data/error"
         jsonToHtmlPath: "/data/json-to-html"
-        jsonToProcessPath: "/data/json-to-process"
+        jsonToProcessPath: "json-to-process"
+        jsonToProcessErrorPath: "json-to-process-error"
+        s3BucketName: "camel-data"
         pdfOutputPath: "/data/pdf"
         geoJsonInputPath: "/data/geo/in"
         geoJsonOutputPath: "/data/geo/out"

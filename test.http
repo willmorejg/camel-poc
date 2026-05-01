@@ -18,7 +18,7 @@ curl -X 'POST' \
   -H 'Content-Type: application/json' \
   -H 'Authorization: Bearer {{token}}' \
   -d '[
-        {
+        
             "name": "James G Willmore",
             "address1": "832 Savitt Place",
             "address2": "",

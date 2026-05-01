@@ -3,7 +3,7 @@
       - path: /ingest/upload
         consumes: application/json
         produces: application/json
-        description: "Accept a JSON payload and write it to the incoming file directory"
+        description: "Accept a JSON payload and write it to S3"
         param:
           - name: body
             type: body
@@ -32,10 +32,14 @@
               - setProperty:
                   name: writeSuccess
                   constant: "false"
+              - setHeader:
+                  name: CamelAwsS3Key
+                  expression:
+                    simple: "{{camel.variables.jsonToProcessPath}}/${header.CamelFileName}"
               - multicast:
                   parallelProcessing: true
                   steps:
-                    - to: "file:{{camel.variables.jsonToProcessPath}}?delete=false&fileName=${header.CamelFileName}"
+                    - to: "aws2-s3://{{camel.variables.s3BucketName}}"
               - setProperty:
                   name: writeSuccess
                   constant: "true"
@@ -48,12 +52,10 @@
                       constant: "false"
                   - log:
                       loggingLevel: ERROR
-                      message: "File write failed: ${exception.message} - attempting cleanup of ${header.CamelFileName}"
+                      message: "S3 write failed: ${exception.message} - key ${header.CamelAwsS3Key}"
                   - setProperty:
                       name: exceptionMessage
                       simple: "${exception.message}"
-                  - to:
-                      uri: "bean:fileCleanupBean?method=deleteIfExists"
         - setHeader:
             name: Content-Type
             constant: application/json

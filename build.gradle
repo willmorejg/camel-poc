@@ -40,6 +40,7 @@ dependencies {
     // to find the version, then set it in gradle.properties as camelVersion=x.x.x
     implementation "org.apache.camel:camel-thymeleaf:${camelVersion}"
 
+	implementation "org.apache.camel.springboot:camel-aws2-s3-starter:${camelVersion}"
 	implementation "org.apache.camel.springboot:camel-yaml-dsl-starter:${camelVersion}"
 	implementation "org.apache.camel.springboot:camel-jackson-starter:${camelVersion}"
     implementation "org.apache.camel.springboot:camel-jacksonxml-starter:${camelVersion}"

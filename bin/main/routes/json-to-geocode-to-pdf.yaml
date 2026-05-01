@@ -7,7 +7,7 @@
       - log:
           loggingLevel: ERROR
           message: >-
-            Invalid JSON structure in ${header.CamelFileName} - expected an
+            Invalid JSON structure in ${header.CamelAwsS3Key} - expected an
             array of AddressRecord objects. Deleting. Error:
             ${exception.message}\n${exception.stacktrace}
       - to:
@@ -16,21 +16,23 @@
 - route:
     id: json-to-geocode-to-pdf
     from:
-      uri: "file:{{camel.variables.jsonToProcessPath}}"
+      uri: "aws2-s3://{{camel.variables.s3BucketName}}"
       parameters:
-        delete: true
-        readLock: changed
-        readLockCheckInterval: 500
-        readLockTimeout: 10000
-        include: ".*\\.json"
-        recursive: false
+        prefix: "{{camel.variables.jsonToProcessPath}}/"
+        deleteAfterRead: true
+        delay: 5000
+        maxMessagesPerPoll: 10
       steps:
         - log:
-            message: "Processing JSON file: ${header.CamelFileName}"
+            message: "Processing JSON file: ${header.CamelAwsS3Key}"
+        - setProperty:
+            name: originalBody
+            expression:
+              simple: "${body}"
         - setProperty:
             name: baseFileName
             expression:
-              simple: "${file:name.noext}"
+              simple: "${header.CamelAwsS3Key.replaceAll('.*/', '').replaceAll('\\.json$', '')}"
         - setProperty:
             name: nowTimestamp
             expression:
@@ -74,4 +76,4 @@
                       uri: "bean:fileCleanupBean?method=moveToError"
                   - log:
                       loggingLevel: ERROR
-                      message: "Error processing ${header.CamelFileName}: ${exception.message}\n${exception.stacktrace}"
+                      message: "Error processing ${header.CamelAwsS3Key}: ${exception.message}\n${exception.stacktrace}"

@@ -16,6 +16,10 @@
             name: baseFileName
             expression:
               simple: '${file:name.noext}'
+        - setProperty:
+            name: nowTimestamp
+            expression:
+              simple: "${date:now:yyyyMMdd-HHmmss-SSSSS}"
         - doTry:
             steps:
               - unmarshal:
@@ -26,7 +30,7 @@
                   json: {}
               - to:
                   uri: >-
-                    file:{{camel.variables.jsonToProcessPath}}?delete=false&fileName=${header.baseFileName}-csv.json
+                    file:{{camel.variables.jsonToProcessPath}}?delete=false&fileName=${header.baseFileName}-csv-${header.nowTimestamp}.json
               - to:
                   uri: 'bean:fileCleanupBean?method=deleteIfExists'
               - log:
