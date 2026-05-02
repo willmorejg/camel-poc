@@ -97,3 +97,4 @@ ldap/config/*
 
 data/*
 logs/*
+bin/*
